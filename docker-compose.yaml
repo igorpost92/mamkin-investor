@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: ${COMPOSE_PROJECT_NAME}-db
+    image: postgres:16.0
+    environment:
+      - PGPORT=$DB_PORT
+      - POSTGRES_DB=$DB_NAME
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+    volumes:
+      - ~/Documents/apps-db/${COMPOSE_PROJECT_NAME}:/var/lib/postgresql/data
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    restart: always

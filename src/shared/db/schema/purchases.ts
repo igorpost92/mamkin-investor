@@ -1,0 +1,35 @@
+import { relations } from 'drizzle-orm';
+import { pgTable, text, uuid, numeric, timestamp } from 'drizzle-orm/pg-core';
+import { brokersTable } from './brokers';
+import { assetsTable } from './assets';
+
+export const purchasesTable = pgTable('purchases', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  date: timestamp('date', { mode: 'date' }).notNull(),
+  brokerId: uuid('brokerId')
+    .references(() => brokersTable.id)
+    .notNull(),
+  assetId: uuid('assetId')
+    .references(() => assetsTable.id)
+    .notNull(),
+  currency: text('currency').notNull(),
+  quantity: numeric('quantity').notNull(),
+  price: numeric('price').notNull(),
+  sum: numeric('sum').notNull(),
+  commission: numeric('commission'),
+  brokerTransactionId: text('brokerTransactionId'),
+});
+
+export const purchasesRelations = relations(purchasesTable, ({ one }) => ({
+  asset: one(assetsTable, {
+    fields: [purchasesTable.assetId],
+    references: [assetsTable.id],
+  }),
+  broker: one(brokersTable, {
+    fields: [purchasesTable.brokerId],
+    references: [brokersTable.id],
+  }),
+}));
+
+export type Purchase = typeof purchasesTable.$inferSelect;
+export type NewPurchase = typeof purchasesTable.$inferInsert;

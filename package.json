@@ -4,21 +4,47 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "debug": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy:local": "docker-compose --env-file envs/.env.dev up -d --build",
+    "db:migrate": "drizzle-kit generate:pg --schema=./src/db/schema/**.ts"
   },
   "dependencies": {
+    "@mantine/core": "^7.5.2",
+    "@mantine/dates": "^7.5.2",
+    "@mantine/hooks": "^7.5.2",
+    "axios": "^1.6.3",
+    "classnames": "^2.5.1",
+    "date-fns": "^3.2.0",
+    "dayjs": "^1.11.10",
+    "drizzle-kit": "^0.20.9",
+    "drizzle-orm": "^0.29.2",
+    "iconv-lite": "^0.6.3",
+    "lodash": "^4.17.21",
+    "mobile-kit": "file:../bahasa/src/kit",
+    "next": "14.1.0",
+    "pg": "^8.11.3",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.0.4"
+    "react-hook-form": "^7.50.1",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@svgr/webpack": "^8.1.0",
+    "@types/lodash": "^4.14.202",
     "@types/node": "^20",
+    "@types/pg": "^8.10.9",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/xml2js": "^0.4.14",
     "eslint": "^8",
-    "eslint-config-next": "14.0.4"
+    "eslint-config-next": "14.0.4",
+    "postcss-nested": "^6.0.1",
+    "postcss-preset-mantine": "^1.13.0",
+    "postcss-simple-vars": "^7.0.1",
+    "prettier": "^3.1.1",
+    "typescript": "^5"
   }
 }
