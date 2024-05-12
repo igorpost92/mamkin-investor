@@ -29,6 +29,10 @@ export const appRoutes = {
   withdrawal: (id: string) => `${appRoutes.withdrawals}/${id}`,
   newWithdrawal: () => `${appRoutes.withdrawals}/new`,
 
+  splits: '/splits',
+  split: (id: string) => `${appRoutes.splits}/${id}`,
+  newSplit: () => `${appRoutes.splits}/new`,
+
   tradingJournal: '/trading-journal',
   import: '/import',
   portfolio: '/portfolio',
