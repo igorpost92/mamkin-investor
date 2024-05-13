@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { TableColumn } from '../../../shared/ui';
-import { Asset } from '../../../shared/db/schema';
 import { DocumentsListTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';
+import { Asset } from '../../../shared/db/entities';
 
 interface Props {
   data: Asset[];
@@ -17,6 +17,7 @@ const columns: TableColumn[] = [
   { name: 'currency', width: 120 },
   { name: 'type', width: 90 },
   { name: 'uid', title: 'uid' },
+  { name: 'instrumentUid', title: 'Instrument uid' },
 ];
 
 const AssetsList: React.FC<Props> = props => {

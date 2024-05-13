@@ -1,57 +1,61 @@
 'use server';
 
-import { getDb } from '../../../db';
-import { NewWithdrawal, withdrawalsTable } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { appRoutes } from '../../../constants';
+import { getDB } from '../../../db';
+import { Withdrawal, NewWithdrawal } from '../../../db/entities';
+import { instanceToPlain } from 'class-transformer';
 
 const revalidate = () => {
   revalidatePath(appRoutes.withdrawals);
 };
 
+const getRepo = async () => {
+  const db = await getDB();
+  return db.getRepository(Withdrawal);
+};
+
 export const getWithdrawals = async () => {
-  const db = await getDb();
-  const result = await db.query.withdrawalsTable.findMany({
-    with: {
+  const repo = await getRepo();
+  const result = await repo.find({
+    relations: {
       broker: true,
     },
   });
 
-  return result;
+  return instanceToPlain(result) as Withdrawal[];
 };
 
 export const getWithdrawal = async (id: string) => {
-  const db = await getDb();
-
-  const result = await db.query.withdrawalsTable.findFirst({
-    where: eq(withdrawalsTable.id, id),
+  const repo = await getRepo();
+  const result = await repo.findOne({
+    where: { id },
   });
 
-  return result;
+  return instanceToPlain(result) as Withdrawal;
 };
 
 export const createWithdrawal = async (data: NewWithdrawal) => {
-  const db = await getDb();
-  const [result] = await db.insert(withdrawalsTable).values(data).returning();
+  const repo = await getRepo();
+  const result = await repo.insert(data);
 
   revalidate();
-  return result.id;
+  return result.identifiers[0].id as string;
 };
 
 export const updateWithdrawal = async (id: string, data: NewWithdrawal) => {
   const { id: _id, ...dataWithoutId } = data;
 
-  const db = await getDb();
-  await db.update(withdrawalsTable).set(dataWithoutId).where(eq(withdrawalsTable.id, id));
+  const repo = await getRepo();
+  await repo.update(id, dataWithoutId);
 
   revalidate();
   return id;
 };
 
 export const deleteWithdrawal = async (id: string) => {
-  const db = await getDb();
-  await db.delete(withdrawalsTable).where(eq(withdrawalsTable.id, id));
+  const repo = await getRepo();
+  await repo.delete(id);
 
   revalidate();
 };

@@ -15,7 +15,7 @@ export interface TradingOperation {
 }
 
 export interface CashOperation {
-  type: 'deposit' | 'withdraw';
+  type: 'deposit' | 'withdrawal';
   date: Date;
   sum: number;
   currency: Currency;

@@ -13,6 +13,7 @@ const fields: DocumentFieldConfig[] = [
   { name: 'currency' },
   { name: 'type' },
   { name: 'uid', title: 'uid' },
+  { name: 'instrumentUid', title: 'Instrument uid' },
 ];
 
 interface Props {

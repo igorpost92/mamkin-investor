@@ -1,9 +1,9 @@
 'use server';
 
-import { getDBConnection } from '../../../dbNew';
+import { getDB } from '../../../db';
 import { revalidatePath } from 'next/cache';
 import { appRoutes } from '../../../constants';
-import { NewTransfer, Transfer } from '../../../dbNew/entities';
+import { NewTransfer, Transfer } from '../../../db/entities';
 import { instanceToPlain } from 'class-transformer';
 
 const revalidate = () => {
@@ -11,7 +11,7 @@ const revalidate = () => {
 };
 
 const getRepo = async () => {
-  const db = await getDBConnection();
+  const db = await getDB();
   return db.getRepository(Transfer);
 };
 
@@ -42,7 +42,7 @@ export const createTransfer = async (data: NewTransfer) => {
   const result = await repo.insert(data);
 
   revalidate();
-  return result.generatedMaps[0];
+  return result.identifiers[0].id as string;
 };
 
 export const updateTransfer = async (id: string, data: NewTransfer) => {

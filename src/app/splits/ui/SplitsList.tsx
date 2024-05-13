@@ -2,19 +2,15 @@
 
 import React from 'react';
 import { TableColumn } from '../../../shared/ui';
-import { Asset, Split } from '../../../shared/db/schema';
+import { Split } from '../../../shared/db/entities';
 import { appRoutes } from '../../../shared/constants';
 import { DocumentsListTemplate } from '../../../widgets/document';
 
-type TableDataItem = Split & {
-  asset: Asset;
-};
-
 interface Props {
-  data: TableDataItem[];
+  data: Split[];
 }
 
-const columns: TableColumn<TableDataItem>[] = [
+const columns: TableColumn<Split>[] = [
   { name: 'date', type: 'date' },
   {
     name: 'asset',

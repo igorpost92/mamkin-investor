@@ -1,16 +1,15 @@
 import { sqlRelationColumn } from '../../../shared/db/utils';
-import { assetsTable, brokersTable } from '../../../shared/db/schema';
-import { sql } from 'drizzle-orm';
-import { getDb } from '../../../shared/db';
 import { TradingJournalDatum } from '../config/types';
+import { Asset, Broker } from '../../../shared/db/entities';
+import { getDB } from '../../../shared/db';
 
 // TODO: what do u want here?
 
 export const getData = async () => {
-  const assetColumnSql = sqlRelationColumn(assetsTable, 'a');
-  const brokerColumnSql = sqlRelationColumn(brokersTable, 'b');
+  const assetColumnSql = await sqlRelationColumn(Asset, 'a');
+  const brokerColumnSql = await sqlRelationColumn(Broker, 'b');
 
-  const query = sql.raw(`
+  const query = `
     select 
     q.id, operation, date, 
     ${assetColumnSql} asset, ${brokerColumnSql} broker,
@@ -24,16 +23,10 @@ export const getData = async () => {
     ) q
     left join assets a on q."assetId" = a.id
     left join brokers b on q."brokerId" = b.id
-  `);
+  `;
 
-  const db = await getDb();
-  const { rows: result } = await db.execute(query);
+  const db = await getDB();
+  const result = await db.query(query);
 
-  // TODO: drizzle date field bug
-  const parsedData = result.map((item: any) => ({
-    ...item,
-    date: new Date(item.date),
-  }));
-
-  return parsedData as TradingJournalDatum[];
+  return result as TradingJournalDatum[];
 };

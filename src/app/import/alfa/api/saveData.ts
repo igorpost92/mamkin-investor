@@ -1,25 +1,31 @@
 import { AlfaOperation, TradingOperation } from './types';
-import { getDb, Transaction } from '../../../../shared/db';
+import { brokers } from '../../../../shared/constants';
+import { getDB, NewTx } from '../../../../shared/db';
 import {
-  assetsTable,
-  brokersTable,
-  depositsTable,
+  Asset,
+  Broker,
+  Deposit,
   NewAsset,
   NewBroker,
   NewDeposit,
   NewPurchase,
   NewSell,
   NewWithdrawal,
-  purchasesTable,
-  sellsTable,
-  withdrawalsTable,
-} from '../../../../shared/db/schema';
-import { eq } from 'drizzle-orm';
+  Purchase,
+  Sell,
+  Withdrawal,
+} from '../../../../shared/db/entities';
 
-const getOrCreateAsset = async (operation: TradingOperation, tx: Transaction): Promise<string> => {
+const getOrCreateAsset = async (
+  operation: TradingOperation,
+  tx: NewTx,
+  onCreate: () => void,
+): Promise<string> => {
   const { isin } = operation;
 
-  let [asset] = await tx.select().from(assetsTable).where(eq(assetsTable.isin, isin));
+  const repo = tx.getRepository(Asset);
+
+  const asset = await repo.findOne({ where: { isin } });
 
   if (asset) {
     return asset.id;
@@ -31,36 +37,36 @@ const getOrCreateAsset = async (operation: TradingOperation, tx: Transaction): P
     currency: operation.currency,
   };
 
-  [asset] = await tx.insert(assetsTable).values(newAsset).returning();
+  const result = await repo.insert(newAsset);
 
+  onCreate();
   console.log(`created asset: ${operation.asset}`);
 
-  // TODO: count new assets
-
-  return asset.id;
+  return result.identifiers[0].id;
 };
 
-const getBrokerId = async (tx: Transaction) => {
-  // TODO: name and id const
-  const brokerName = 'Альфа';
+const getBrokerId = async (tx: NewTx) => {
+  const id = brokers.alfa;
 
-  let [broker] = await tx.select().from(brokersTable).where(eq(brokersTable.name, brokerName));
+  const repo = tx.getRepository(Broker);
+  const broker = await repo.findOne({ where: { id } });
 
-  if (!broker) {
-    const newBroker: NewBroker = {
-      id: '0487b3c0-b181-4fd2-9a2e-500f52254c20',
-      name: brokerName,
-    };
-
-    const item = await tx.insert(brokersTable).values(newBroker).returning();
-    broker = item[0];
+  if (broker) {
+    return broker.id;
   }
 
-  return broker.id;
+  const newBroker: NewBroker = {
+    id,
+    name: 'Альфа',
+  };
+
+  const result = await repo.insert(newBroker);
+  return result.identifiers[0].id;
 };
 
 export const saveData = async (operations: AlfaOperation[]) => {
   const count = {
+    asset: 0,
     deposit: 0,
     // TODO:
     // dividend: 0,
@@ -71,20 +77,20 @@ export const saveData = async (operations: AlfaOperation[]) => {
 
   console.log('saving start, operations count -', operations.length);
 
-  const db = await getDb();
+  const db = await getDB();
   await db.transaction(async tx => {
     const brokerId = await getBrokerId(tx);
 
     for (const operation of operations) {
       // TODO: if already exists
 
-      if (operation.type === 'deposit' || operation.type === 'withdraw') {
-        if (operation.type === 'withdraw') {
+      if (operation.type === 'deposit' || operation.type === 'withdrawal') {
+        if (operation.type === 'withdrawal') {
           // TODO: check if everything is working
           throw new Error('check withdraw!');
         }
 
-        const table = operation.type === 'deposit' ? depositsTable : withdrawalsTable;
+        const repo = tx.getRepository(operation.type === 'deposit' ? Deposit : Withdrawal);
 
         const newItem: NewDeposit | NewWithdrawal = {
           date: operation.date,
@@ -93,7 +99,7 @@ export const saveData = async (operations: AlfaOperation[]) => {
           currency: operation.currency,
         };
 
-        await tx.insert(table).values(newItem);
+        await repo.insert(newItem);
 
         if (operation.type === 'deposit') {
           count.deposit++;
@@ -105,14 +111,11 @@ export const saveData = async (operations: AlfaOperation[]) => {
       }
 
       if (operation.type === 'purchase' || operation.type === 'sell') {
-        if (operation.type === 'sell') {
-          // TODO: check if everything is working
-          throw new Error('check sell!');
-        }
+        const repo = tx.getRepository(operation.type === 'purchase' ? Purchase : Sell);
 
-        const table = operation.type === 'purchase' ? purchasesTable : sellsTable;
-
-        const assetId = await getOrCreateAsset(operation, tx);
+        const assetId = await getOrCreateAsset(operation, tx, () => {
+          count.asset++;
+        });
 
         const newItem: NewPurchase | NewSell = {
           date: operation.date,
@@ -125,7 +128,7 @@ export const saveData = async (operations: AlfaOperation[]) => {
           brokerTransactionId: operation.id,
         };
 
-        await tx.insert(table).values(newItem);
+        await repo.insert(newItem);
 
         if (operation.type === 'purchase') {
           count.purchase++;

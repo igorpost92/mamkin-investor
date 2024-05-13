@@ -9,3 +9,7 @@ export class Broker {
   @Column('text')
   name!: string;
 }
+
+export type NewBroker = Omit<Broker, 'id'> & {
+  id?: string;
+};

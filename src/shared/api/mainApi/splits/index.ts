@@ -1,57 +1,61 @@
 'use server';
 
-import { getDb } from '../../../db';
-import { NewSplit, splitsTable } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { appRoutes } from '../../../constants';
+import { getDB } from '../../../db';
+import { Split, NewSplit } from '../../../db/entities';
+import { instanceToPlain } from 'class-transformer';
 
 const revalidate = () => {
   revalidatePath(appRoutes.splits);
 };
 
+const getRepo = async () => {
+  const db = await getDB();
+  return db.getRepository(Split);
+};
+
 export const getSplits = async () => {
-  const db = await getDb();
-  const result = await db.query.splitsTable.findMany({
-    with: {
+  const repo = await getRepo();
+  const result = await repo.find({
+    relations: {
       asset: true,
     },
   });
 
-  return result;
+  return instanceToPlain(result) as Split[];
 };
 
 export const getSplit = async (id: string) => {
-  const db = await getDb();
-
-  const result = await db.query.splitsTable.findFirst({
-    where: eq(splitsTable.id, id),
+  const repo = await getRepo();
+  const result = await repo.findOne({
+    where: { id },
   });
 
-  return result;
+  return instanceToPlain(result) as Split;
 };
 
 export const createSplit = async (data: NewSplit) => {
-  const db = await getDb();
-  const [result] = await db.insert(splitsTable).values(data).returning();
+  const repo = await getRepo();
+  const result = await repo.insert(data);
 
   revalidate();
-  return result.id;
+  return result.identifiers[0].id as string;
 };
 
 export const updateSplit = async (id: string, data: NewSplit) => {
   const { id: _id, ...dataWithoutId } = data;
 
-  const db = await getDb();
-  await db.update(splitsTable).set(dataWithoutId).where(eq(splitsTable.id, id));
+  const repo = await getRepo();
+  await repo.update(id, dataWithoutId);
 
   revalidate();
   return id;
 };
 
 export const deleteSplit = async (id: string) => {
-  const db = await getDb();
-  await db.delete(splitsTable).where(eq(splitsTable.id, id));
+  const repo = await getRepo();
+  await repo.delete(id);
 
   revalidate();
 };

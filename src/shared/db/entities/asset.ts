@@ -27,3 +27,7 @@ export class Asset {
   @Column('text', { nullable: true })
   instrumentUid?: string;
 }
+
+export type NewAsset = Omit<Asset, 'id'> & {
+  id?: string;
+};

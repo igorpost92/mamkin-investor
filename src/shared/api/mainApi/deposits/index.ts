@@ -1,57 +1,61 @@
 'use server';
 
-import { getDb } from '../../../db';
-import { NewDeposit, depositsTable } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { appRoutes } from '../../../constants';
+import { getDB } from '../../../db';
+import { Deposit, NewDeposit } from '../../../db/entities';
+import { instanceToPlain } from 'class-transformer';
 
 const revalidate = () => {
   revalidatePath(appRoutes.deposits);
 };
 
+const getRepo = async () => {
+  const db = await getDB();
+  return db.getRepository(Deposit);
+};
+
 export const getDeposits = async () => {
-  const db = await getDb();
-  const result = await db.query.depositsTable.findMany({
-    with: {
+  const repo = await getRepo();
+  const result = await repo.find({
+    relations: {
       broker: true,
     },
   });
 
-  return result;
+  return instanceToPlain(result) as Deposit[];
 };
 
 export const getDeposit = async (id: string) => {
-  const db = await getDb();
-
-  const result = await db.query.depositsTable.findFirst({
-    where: eq(depositsTable.id, id),
+  const repo = await getRepo();
+  const result = await repo.findOne({
+    where: { id },
   });
 
-  return result;
+  return instanceToPlain(result) as Deposit;
 };
 
 export const createDeposit = async (data: NewDeposit) => {
-  const db = await getDb();
-  const [result] = await db.insert(depositsTable).values(data).returning();
+  const repo = await getRepo();
+  const result = await repo.insert(data);
 
   revalidate();
-  return result.id;
+  return result.identifiers[0].id as string;
 };
 
 export const updateDeposit = async (id: string, data: NewDeposit) => {
   const { id: _id, ...dataWithoutId } = data;
 
-  const db = await getDb();
-  await db.update(depositsTable).set(dataWithoutId).where(eq(depositsTable.id, id));
+  const repo = await getRepo();
+  await repo.update(id, dataWithoutId);
 
   revalidate();
   return id;
 };
 
 export const deleteDeposit = async (id: string) => {
-  const db = await getDb();
-  await db.delete(depositsTable).where(eq(depositsTable.id, id));
+  const repo = await getRepo();
+  await repo.delete(id);
 
   revalidate();
 };

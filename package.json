@@ -8,8 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy:local": "docker-compose --env-file envs/.env.dev up -d --build",
-    "db:migrate": "drizzle-kit generate:pg --schema=./src/db/schema/**.ts"
+    "deploy:local": "docker-compose --env-file envs/.env.dev up -d --build"
   },
   "dependencies": {
     "@mantine/core": "^7.5.2",
@@ -20,8 +19,6 @@
     "classnames": "^2.5.1",
     "date-fns": "^3.2.0",
     "dayjs": "^1.11.10",
-    "drizzle-kit": "^0.20.9",
-    "drizzle-orm": "^0.29.2",
     "iconv-lite": "^0.6.3",
     "lodash": "^4.17.21",
     "mobile-kit": "file:../bahasa/src/kit",

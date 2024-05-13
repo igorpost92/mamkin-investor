@@ -2,20 +2,15 @@
 
 import React from 'react';
 import { TableColumn } from '../../../shared/ui';
-import { Asset, Broker, Purchase } from '../../../shared/db/schema';
+import { Purchase } from '../../../shared/db/entities';
 import { appRoutes } from '../../../shared/constants';
 import { DocumentsListTemplate } from '../../../widgets/document';
 
-type TableDataItem = Purchase & {
-  broker: Broker;
-  asset: Asset;
-};
-
 interface Props {
-  data: TableDataItem[];
+  data: Purchase[];
 }
 
-const columns: TableColumn<TableDataItem>[] = [
+const columns: TableColumn<Purchase>[] = [
   { name: 'date', type: 'date' },
   {
     name: 'broker',

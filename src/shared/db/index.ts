@@ -1,9 +1,17 @@
 import 'reflect-metadata';
 import pg from 'pg';
-import { DataSource } from 'typeorm';
-import { Transfer } from './entities/transfer';
-import { Broker } from './entities/broker';
-import { Asset } from './entities/asset';
+import { DataSource, EntityManager } from 'typeorm';
+import {
+  Asset,
+  Broker,
+  Deposit,
+  Dividend,
+  Purchase,
+  Sell,
+  Split,
+  Transfer,
+  Withdrawal,
+} from './entities';
 
 const pgConnection = new DataSource({
   // TODO: envs
@@ -15,10 +23,10 @@ const pgConnection = new DataSource({
   password: 'postgres',
   synchronize: true,
   // logging: true,
-  entities: [Broker, Asset, Transfer],
+  entities: [Asset, Broker, Deposit, Dividend, Purchase, Sell, Split, Transfer, Withdrawal],
 });
 
-export const getDBConnection = async (): Promise<DataSource> => {
+export const getDB = async (): Promise<DataSource> => {
   // TODO:
   pg.types.setTypeParser(1184, (v: any) => new Date(v));
 
@@ -28,3 +36,5 @@ export const getDBConnection = async (): Promise<DataSource> => {
 
   return pgConnection;
 };
+
+export type NewTx = EntityManager;

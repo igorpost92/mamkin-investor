@@ -4,7 +4,7 @@ import React from 'react';
 import { TableColumn } from '../../../shared/ui';
 import { appRoutes } from '../../../shared/constants';
 import { DocumentsListTemplate } from '../../../widgets/document';
-import { Transfer } from '../../../shared/dbNew/entities/transfer';
+import { Transfer } from '../../../shared/db/entities/transfer';
 
 interface Props {
   data: Transfer[];

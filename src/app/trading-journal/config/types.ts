@@ -1,4 +1,4 @@
-import { Asset, Broker } from '../../../shared/db/schema';
+import { Asset, Broker } from '../../../shared/db/entities';
 
 export interface TradingJournalDatum {
   id: string;

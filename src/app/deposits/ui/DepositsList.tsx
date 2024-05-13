@@ -2,19 +2,15 @@
 
 import React from 'react';
 import { TableColumn } from '../../../shared/ui';
-import { Broker, Deposit } from '../../../shared/db/schema';
+import { Deposit } from '../../../shared/db/entities';
 import { DocumentsListTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';
 
-type TableDataItem = Deposit & {
-  broker: Broker;
-};
-
 interface Props {
-  data: TableDataItem[];
+  data: Deposit[];
 }
 
-const columns: TableColumn<TableDataItem>[] = [
+const columns: TableColumn<Deposit>[] = [
   { name: 'date', type: 'date' },
   {
     name: 'broker',
