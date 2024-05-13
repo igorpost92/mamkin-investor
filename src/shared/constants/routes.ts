@@ -33,6 +33,10 @@ export const appRoutes = {
   split: (id: string) => `${appRoutes.splits}/${id}`,
   newSplit: () => `${appRoutes.splits}/new`,
 
+  transfers: '/transfers',
+  transfer: (id: string) => `${appRoutes.transfers}/${id}`,
+  newTransfer: () => `${appRoutes.transfers}/new`,
+
   tradingJournal: '/trading-journal',
   import: '/import',
   portfolio: '/portfolio',

@@ -5,4 +5,5 @@ export * from './dividends';
 export * from './purchases';
 export * from './sells';
 export * from './splits';
+export * from './transfers';
 export * from './withdrawals';
