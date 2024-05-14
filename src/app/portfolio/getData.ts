@@ -13,7 +13,7 @@ interface Position {
 
 // TODO: refacto
 
-const getPositions = async () => {
+const getPositions = async (brokerId?: string) => {
   // todo objects instead of columns
 
   const query = `
@@ -39,9 +39,6 @@ const getPositions = async () => {
     ) q
     join assets a on a.id = q."assetId"
     where a.type != 'currency'
-    --where  b.name = 'Тинькофф'
-    --where "assetId" = 'c4a4aaf0-53fd-4856-bee4-c4bfa650ec11'
-    
     order by date
   ;`;
 
@@ -266,7 +263,9 @@ const getPositions = async () => {
       return;
     }
 
-    const records = Object.values(brokers).flat();
+    // TODO: refacto
+    const brokersList = brokerId ? [brokers[brokerId]] : Object.values(brokers);
+    const records = brokersList.flat();
 
     const quantity = sumBy(records, item => {
       if (!item) {

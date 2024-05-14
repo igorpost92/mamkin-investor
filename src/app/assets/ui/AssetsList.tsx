@@ -12,7 +12,7 @@ interface Props {
 
 const columns: TableColumn[] = [
   { name: 'name' },
-  { name: 'ticker', width: 100 },
+  { name: 'ticker', width: 160 },
   { name: 'isin', title: 'ISIN', width: 160 },
   { name: 'currency', width: 120 },
   { name: 'type', width: 90 },

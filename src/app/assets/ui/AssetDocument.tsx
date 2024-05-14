@@ -8,7 +8,7 @@ import { appRoutes } from '../../../shared/constants';
 
 const fields: DocumentFieldConfig[] = [
   { name: 'name', required: true },
-  { name: 'ticker', required: true },
+  { name: 'ticker' },
   { name: 'isin', title: 'ISIN' },
   { name: 'currency' },
   { name: 'type' },
