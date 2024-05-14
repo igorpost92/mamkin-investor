@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy:local": "docker-compose --env-file envs/.env.dev up -d --build"
+    "deploy:local": "docker-compose --env-file .env.development up -d --build"
   },
   "dependencies": {
     "@mantine/core": "^7.5.2",

@@ -27,7 +27,7 @@ const fields: DocumentFieldConfig[] = [
   {
     name: 'brokerToId',
     required: true,
-    title: 'Broker from',
+    title: 'Broker to',
     type: 'object',
     getOptions: getBrokers,
     getId: data => data.id,

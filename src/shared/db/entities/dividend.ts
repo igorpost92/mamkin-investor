@@ -48,6 +48,6 @@ export class Dividend {
   brokerTransactionId?: string;
 }
 
-export type NewDividend = Omit<Dividend, 'id'> & {
+export type NewDividend = Omit<Dividend, 'id' | 'asset' | 'broker'> & {
   id?: string;
 };
