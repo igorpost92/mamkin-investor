@@ -11,6 +11,7 @@ export interface TradingOperation {
   currency: Currency;
   qty: number;
   sum: number;
+  nkd?: number;
 }
 
 export interface CashOperation {

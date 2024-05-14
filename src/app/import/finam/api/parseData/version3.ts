@@ -8,15 +8,13 @@ import {
 } from '../types';
 import { orderBy } from 'lodash';
 
-const parseDay = (dayString: string) => {
-  const [day, month, year] = dayString.split('.');
-  // TODO: timezone
-  return new Date(`${year}/${month}/${day}`);
-};
-
 const parseDatetime = (dayString: string, time: string) => {
   const [day, month, year] = dayString.split('.');
   return new Date(`${year}-${month}-${day}T${time}+0300`);
+};
+
+const parseDay = (dayString: string) => {
+  return parseDatetime(dayString, '00:00:00');
 };
 
 const parseCurrency = (rawData: string): Currency => {
@@ -67,7 +65,7 @@ const parseISIN = (rawData: string) => {
 
     if (isin === 'US87238U2033') {
       // tinkoff
-      return 'TCS7238U2033';
+      return 'RU000A107UL4';
     }
 
     return isin;
@@ -200,6 +198,8 @@ const parseTradingOperations = (sections: any) => {
 
   tradingOperations.forEach(({ $: item }: any) => {
     if (item.Op === 'Покупка' || item.Op === 'Продажа') {
+      const isPurchase = item.Op === 'Покупка';
+
       const id = item.RqNo;
 
       // TODO: big js or own
@@ -215,15 +215,24 @@ const parseTradingOperations = (sections: any) => {
         return;
       }
 
+      let nkd;
+      if (item.ACY) {
+        nkd = Number(item.ACY);
+        if (isPurchase) {
+          nkd = -nkd;
+        }
+      }
+
       const dataItem: TradingOperation = {
         id,
-        type: item.Op === 'Покупка' ? 'purchase' : 'sell',
+        type: isPurchase ? 'purchase' : 'sell',
         date: parseDatetime(item.D, item.T),
         asset: item.IS ?? item.I,
         isin: parseISIN(item.ISIN),
         currency: parseCurrency(item.Cur),
         qty,
         sum,
+        nkd,
       };
 
       ops.push(dataItem);

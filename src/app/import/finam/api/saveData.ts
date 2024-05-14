@@ -118,6 +118,20 @@ export const saveOperations = async (operations: FinamOperation[]) => {
           count.asset++;
         });
 
+        if (operation.nkd) {
+          const newDividend: NewDividend = {
+            date: operation.date,
+            brokerId,
+            assetId,
+            currency: operation.currency,
+            sum: operation.nkd,
+            sumRub: operation.currency === 'RUB' ? operation.nkd : undefined,
+          };
+
+          const repo = tx.getRepository(Dividend);
+          await repo.insert(newDividend);
+        }
+
         const newItem: NewPurchase | NewSell = {
           date: operation.date,
           brokerId,

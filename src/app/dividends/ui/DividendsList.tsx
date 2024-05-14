@@ -25,7 +25,7 @@ const columns: TableColumn<Dividend>[] = [
     getPresentation: data => data.asset.name,
   },
   { name: 'currency' },
-  { name: 'sum', type: 'number' },
+  { name: 'sum', type: 'number', footer: true },
   { name: 'sumRub', type: 'number', title: 'Sum (rub)' },
   { name: 'commission', type: 'number' },
   { name: 'brokerTransactionId' },
