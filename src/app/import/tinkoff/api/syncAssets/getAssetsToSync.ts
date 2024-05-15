@@ -9,7 +9,13 @@ export const getAssetsToSync = async (data: Asset[]) => {
   const result = data.map(asset => {
     let instrumentWithType;
 
-    const possibleMatches = instruments.filter(item => item.instrument.isin === asset.isin);
+    const possibleMatches = instruments.filter(item => {
+      if (asset.type === 'currency') {
+        // TODO: no assetUid for currency
+        return item.instrument.ticker === asset.ticker;
+      }
+      return item.instrument.isin === asset.isin;
+    });
 
     if (!possibleMatches.length) {
       console.log(`not found for ${asset.name}`);

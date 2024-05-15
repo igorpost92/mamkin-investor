@@ -26,6 +26,6 @@ export class Split {
   // currency: text('currency').notNull(),
 }
 
-export type NewSplit = Omit<Split, 'id'> & {
+export type NewSplit = Omit<Split, 'id' | 'asset'> & {
   id?: string;
 };

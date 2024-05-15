@@ -47,6 +47,6 @@ export class Sell {
   brokerTransactionId?: string;
 }
 
-export type NewSell = Omit<Sell, 'id'> & {
+export type NewSell = Omit<Sell, 'id' | 'asset' | 'broker'> & {
   id?: string;
 };

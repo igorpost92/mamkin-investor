@@ -24,7 +24,6 @@ const getOrCreateAsset = async (
   const { isin } = operation;
 
   const repo = tx.getRepository(Asset);
-
   const asset = await repo.findOne({ where: { isin } });
 
   if (asset) {
@@ -90,8 +89,6 @@ export const saveData = async (operations: AlfaOperation[]) => {
           throw new Error('check withdraw!');
         }
 
-        const repo = tx.getRepository(operation.type === 'deposit' ? Deposit : Withdrawal);
-
         const newItem: NewDeposit | NewWithdrawal = {
           date: operation.date,
           brokerId,
@@ -99,6 +96,7 @@ export const saveData = async (operations: AlfaOperation[]) => {
           currency: operation.currency,
         };
 
+        const repo = tx.getRepository(operation.type === 'deposit' ? Deposit : Withdrawal);
         await repo.insert(newItem);
 
         if (operation.type === 'deposit') {
@@ -111,8 +109,6 @@ export const saveData = async (operations: AlfaOperation[]) => {
       }
 
       if (operation.type === 'purchase' || operation.type === 'sell') {
-        const repo = tx.getRepository(operation.type === 'purchase' ? Purchase : Sell);
-
         const assetId = await getOrCreateAsset(operation, tx, () => {
           count.asset++;
         });
@@ -128,6 +124,7 @@ export const saveData = async (operations: AlfaOperation[]) => {
           brokerTransactionId: operation.id,
         };
 
+        const repo = tx.getRepository(operation.type === 'purchase' ? Purchase : Sell);
         await repo.insert(newItem);
 
         if (operation.type === 'purchase') {

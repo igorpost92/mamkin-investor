@@ -41,6 +41,6 @@ export class Transfer {
   quantity!: number;
 }
 
-export type NewTransfer = Omit<Transfer, 'id'> & {
+export type NewTransfer = Omit<Transfer, 'id' | 'brokerFrom' | 'brokerTo' | 'asset'> & {
   id?: string;
 };

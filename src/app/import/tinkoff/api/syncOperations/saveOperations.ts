@@ -286,7 +286,8 @@ export const saveOperations = async (operations: TinkoffOperation[]) => {
           brokerToId: brokerId,
           assetId,
           quantity: operation.qty,
-          brokerTransactionId: operation.id,
+          // TODO:
+          // brokerTransactionId: operation.id,
         };
 
         const repo = tx.getRepository(Transfer);

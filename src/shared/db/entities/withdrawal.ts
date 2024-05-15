@@ -28,6 +28,6 @@ export class Withdrawal {
   brokerTransactionId?: string;
 }
 
-export type NewWithdrawal = Omit<Withdrawal, 'id'> & {
+export type NewWithdrawal = Omit<Withdrawal, 'id' | 'broker'> & {
   id?: string;
 };

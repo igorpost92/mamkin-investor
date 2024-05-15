@@ -28,6 +28,6 @@ export class Deposit {
   brokerTransactionId?: string;
 }
 
-export type NewDeposit = Omit<Deposit, 'id'> & {
+export type NewDeposit = Omit<Deposit, 'id' | 'broker'> & {
   id?: string;
 };
