@@ -8,6 +8,7 @@ export interface Position {
   quantity: number;
   avgPrice: number;
   price?: number;
+  priceDelta?: number;
   weight: number;
   amount: number;
   amountInRub: number;

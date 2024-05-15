@@ -13,12 +13,21 @@ const Portfolio: React.FC<Props> = props => {
 
   const columns: TableColumn<Position>[] = [
     { name: 'asset', type: 'object', getPresentation: data => data.asset.name },
-    { name: 'weight', type: 'number', precision: 2 },
-    { name: 'avgPrice', type: 'number', width: 300, precision: 2 },
-    { name: 'quantity', type: 'number', width: 300 },
-    { name: 'currency', type: 'object', getPresentation: data => data.asset.currency },
-    { name: 'amount', type: 'number', precision: 0 },
-    { name: 'amountInRub', type: 'number', precision: 0, footer: true },
+    { name: 'currency', type: 'object', width: 110, getPresentation: data => data.asset.currency },
+    { name: 'weight', type: 'number', width: 100, precision: 2 },
+    { name: 'avgPrice', title: 'Avg.price', type: 'number', width: 150, precision: 2 },
+    { name: 'price', type: 'number', width: 150, precision: 2 },
+    { name: 'priceDelta', title: 'Price (%)', type: 'number', width: 150, precision: 2 },
+    { name: 'quantity', type: 'number', width: 150 },
+    { name: 'amount', type: 'number', width: 150, precision: 0 },
+    {
+      name: 'amountInRub',
+      title: 'Amount (RUB)',
+      type: 'number',
+      width: 150,
+      precision: 0,
+      footer: true,
+    },
   ];
 
   return (

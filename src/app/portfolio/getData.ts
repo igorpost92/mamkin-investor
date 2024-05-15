@@ -4,6 +4,7 @@ import { sumBy } from 'lodash';
 import { Asset } from '../../shared/db/entities';
 import { getDB } from '../../shared/db';
 import { instanceToPlain } from 'class-transformer';
+import { getCurrencyIsin } from '../../shared/api/tinkoffOpenApi/constants';
 
 interface Position {
   asset: Asset;
@@ -299,14 +300,16 @@ const getPositions = async (brokerId?: string) => {
   return positions;
 };
 
-// TODO: separate file
-const getUsdPrice = async () => {
-  // TODO: global const
-  const usdTicker = 'USD000UTSTOM';
+const getCurrencyRate = async (currency: string) => {
+  const isin = getCurrencyIsin(currency);
+
+  if (!isin) {
+    return;
+  }
 
   const db = await getDB();
   const repo = db.getRepository(Asset);
-  const asset = await repo.findOne({ where: { ticker: usdTicker } });
+  const asset = await repo.findOne({ where: { isin } });
 
   if (!asset?.instrumentUid) {
     return;
@@ -330,7 +333,8 @@ export const getPortfolioData = async () => {
   const prices = await tinkoffOpenApi.getClosePrices(uids);
 
   // TODO: default
-  const usdRate = (await getUsdPrice()) ?? 90;
+  const usdRate = (await getCurrencyRate('USD')) ?? 90;
+  const kztRate = ((await getCurrencyRate('KZT')) ?? 20.77) / 100; // TODO:
 
   const dataWithPrices = positions.map(item => {
     const price = prices.find(priceItem => priceItem.instrumentUid === item.asset.instrumentUid)
@@ -339,15 +343,39 @@ export const getPortfolioData = async () => {
     let priceNum;
     if (price) {
       priceNum = Number(parseTinkoffNumber(price));
+    } else {
+      // TODO: for kzt find different api
+      // priceNum = item.avgPrice;
+    }
+
+    if (priceNum && item.asset.type === 'bond') {
+      // TODO: bonds price
+      priceNum *= 10;
+    }
+
+    let priceDelta;
+    if (priceNum) {
+      priceDelta = (priceNum / item.avgPrice - 1) * 100;
     }
 
     // TODO: nulls
-    const amount = priceNum ? Number(item.quantity) * priceNum : 0;
-    const amountInRub = amount && item.asset.currency === 'USD' ? amount * usdRate : amount;
+    const calcPrice = priceNum ?? item.avgPrice;
+
+    const amount = Number(item.quantity) * calcPrice;
+
+    let currencyRate = 1;
+    if (item.asset.currency === 'USD') {
+      currencyRate = usdRate;
+    } else if (item.asset.currency === 'KZT') {
+      currencyRate = kztRate;
+    }
+
+    const amountInRub = amount * currencyRate;
 
     return {
       ...item,
       price: priceNum,
+      priceDelta,
       amount: amount,
       amountInRub: amountInRub,
     };
@@ -363,7 +391,12 @@ export const getPortfolioData = async () => {
     data => data.amount,
   );
 
-  const totalAmount = rub + usd * usdRate;
+  const kzt = sumBy(
+    dataWithPrices.filter(item => item.asset.currency === 'KZT'),
+    data => data.amount,
+  );
+
+  const totalAmount = rub + usd * usdRate + kzt * kztRate;
 
   const dataWithWeight = dataWithPrices.map(item => {
     const weight = (item.amountInRub / totalAmount) * 100;
