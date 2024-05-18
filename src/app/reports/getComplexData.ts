@@ -1,10 +1,7 @@
-import { tinkoffOpenApi } from '../../shared/api/tinkoffOpenApi';
-import { parseTinkoffNumber } from '../../shared/api/tinkoffOpenApi/utils';
-import { sumBy } from 'lodash';
 import { Asset } from '../../shared/db/entities';
 import { getDB } from '../../shared/db';
+import { sumBy } from 'lodash';
 import { instanceToPlain } from 'class-transformer';
-import { getCurrencyIsin } from '../../shared/api/tinkoffOpenApi/constants';
 
 interface Position {
   asset: Asset;
@@ -14,7 +11,8 @@ interface Position {
 
 // TODO: refacto
 
-const getPositions = async (brokerId?: string) => {
+// TODO: move to another folder
+export const getComplexData = async (brokerId?: string) => {
   // todo objects instead of columns
 
   const query = `
@@ -40,6 +38,7 @@ const getPositions = async (brokerId?: string) => {
     ) q
     join assets a on a.id = q."assetId"
     where a.type != 'currency'
+    --and a.ticker = 'RU000A1059N9'
     order by date
   ;`;
 
@@ -53,7 +52,10 @@ const getPositions = async (brokerId?: string) => {
           [brokerId: string]:
             | undefined
             | {
+                // todo add sellDate, sellPrice for shorts
+                // TODO: rename to buyDate
                 date: Date;
+                // TODO: optional
                 buyPrice: number;
                 quantity: number;
               }[];
@@ -76,41 +78,50 @@ const getPositions = async (brokerId?: string) => {
   const moves: Move[] = [];
 
   res.forEach(doc => {
-    let existingAssetAcc = acc[doc.assetId as string];
-    if (!existingAssetAcc) {
-      existingAssetAcc = {};
-      acc[doc.assetId] = existingAssetAcc;
+    let currentAssetAcc = acc[doc.assetId as string];
+    if (!currentAssetAcc) {
+      currentAssetAcc = {};
+      acc[doc.assetId] = currentAssetAcc;
     }
 
-    let existingBroker = existingAssetAcc[doc.brokerId as string];
-    if (!existingBroker) {
-      existingBroker = [];
-      existingAssetAcc[doc.brokerId] = existingBroker;
+    let currentBroker = currentAssetAcc[doc.brokerId as string];
+    if (!currentBroker) {
+      currentBroker = [];
+      currentAssetAcc[doc.brokerId] = currentBroker;
     }
 
     if (doc.operation === 'buy') {
       let quantityLeft = doc.quantity as number;
 
       while (quantityLeft > 0) {
-        const shortRowIndex = existingBroker.findIndex(item => item.quantity < 0);
+        const shortRowIndex = currentBroker.findIndex(item => item.quantity < 0);
 
         if (shortRowIndex >= 0) {
-          const record = existingBroker[shortRowIndex];
+          const record = currentBroker[shortRowIndex];
           let quantity = Math.min(quantityLeft, Math.abs(record.quantity));
 
           quantityLeft -= quantity;
           record.quantity += quantity;
 
           if (record.quantity === 0) {
-            existingBroker.splice(shortRowIndex, 1);
+            currentBroker.splice(shortRowIndex, 1);
           }
 
-          continue;
-
           // TODO: moves
+
+          // moves.push({
+          //   type: doc.operation,
+          //   assetId: doc.assetId,
+          //   brokerId: doc.brokerId,
+          //   quantity: quantity,
+          //   buyDate: doc.date,
+          //   buyPrice: doc.price,
+          // });
+
+          continue;
         }
 
-        existingBroker.push({
+        currentBroker.push({
           buyPrice: doc.price,
           date: doc.date,
           quantity: quantityLeft,
@@ -120,7 +131,7 @@ const getPositions = async (brokerId?: string) => {
           type: doc.operation,
           assetId: doc.assetId,
           brokerId: doc.brokerId,
-          quantity: doc.quantity,
+          quantity: quantityLeft,
           buyDate: doc.date,
           buyPrice: doc.price,
         });
@@ -136,10 +147,10 @@ const getPositions = async (brokerId?: string) => {
       const accIndex = 0;
 
       while (quantityLeft > 0) {
-        const record = existingBroker[accIndex];
+        const record = currentBroker[accIndex];
 
         if (!record) {
-          existingBroker.push({
+          currentBroker.push({
             // buyPrice: doc.price,
             date: doc.date,
             quantity: -quantityLeft,
@@ -168,7 +179,7 @@ const getPositions = async (brokerId?: string) => {
         quantityLeft -= quantity;
 
         if (record.quantity === 0) {
-          existingBroker.shift();
+          currentBroker.shift();
         }
       }
 
@@ -176,7 +187,7 @@ const getPositions = async (brokerId?: string) => {
     }
 
     if (doc.operation === 'split') {
-      existingBroker.forEach(item => {
+      currentBroker.forEach(item => {
         if (new Date(item.date) < new Date(doc.date)) {
           moves.push({
             type: doc.operation,
@@ -205,17 +216,17 @@ const getPositions = async (brokerId?: string) => {
     }
 
     if (doc.operation === 'transfer') {
-      let newBroker = existingAssetAcc[doc.brokerTo as string];
+      let newBroker = currentAssetAcc[doc.brokerTo as string];
       if (!newBroker) {
         newBroker = [];
-        existingAssetAcc[doc.brokerTo] = newBroker;
+        currentAssetAcc[doc.brokerTo] = newBroker;
       }
 
       let quantityLeft = doc.quantity as number;
       const accIndex = 0;
 
       while (quantityLeft > 0) {
-        const record = existingBroker[accIndex];
+        const record = currentBroker[accIndex];
 
         let quantity = Math.min(Number(record.quantity), Number(quantityLeft));
 
@@ -229,7 +240,7 @@ const getPositions = async (brokerId?: string) => {
         quantityLeft -= quantity;
 
         if (record.quantity === 0) {
-          existingBroker.shift();
+          currentBroker.shift();
         }
 
         moves.push({
@@ -297,115 +308,5 @@ const getPositions = async (brokerId?: string) => {
     });
   });
 
-  return positions;
-};
-
-const getCurrencyRate = async (currency: string) => {
-  const isin = getCurrencyIsin(currency);
-
-  if (!isin) {
-    return;
-  }
-
-  const db = await getDB();
-  const repo = db.getRepository(Asset);
-  const asset = await repo.findOne({ where: { isin } });
-
-  if (!asset?.instrumentUid) {
-    return;
-  }
-
-  const [{ price }] = await tinkoffOpenApi.getClosePrices([asset.instrumentUid]);
-
-  if (!price) {
-    return;
-  }
-
-  return Number(parseTinkoffNumber(price));
-};
-
-// TODO: filter brokerId?: string
-export const getPortfolioData = async () => {
-  const positions = await getPositions();
-
-  const uids = positions.map(item => item.asset.instrumentUid).filter(Boolean) as string[];
-
-  const prices = await tinkoffOpenApi.getClosePrices(uids);
-
-  // TODO: default
-  const usdRate = (await getCurrencyRate('USD')) ?? 90;
-  const kztRate = ((await getCurrencyRate('KZT')) ?? 20.77) / 100; // TODO:
-
-  const dataWithPrices = positions.map(item => {
-    const price = prices.find(priceItem => priceItem.instrumentUid === item.asset.instrumentUid)
-      ?.price;
-
-    let priceNum;
-    if (price) {
-      priceNum = Number(parseTinkoffNumber(price));
-    } else {
-      // TODO: for kzt find different api
-      // priceNum = item.avgPrice;
-    }
-
-    if (priceNum && item.asset.type === 'bond') {
-      // TODO: bonds price
-      priceNum *= 10;
-    }
-
-    let priceDelta;
-    if (priceNum) {
-      priceDelta = (priceNum / item.avgPrice - 1) * 100;
-    }
-
-    // TODO: nulls
-    const calcPrice = priceNum ?? item.avgPrice;
-
-    const amount = Number(item.quantity) * calcPrice;
-
-    let currencyRate = 1;
-    if (item.asset.currency === 'USD') {
-      currencyRate = usdRate;
-    } else if (item.asset.currency === 'KZT') {
-      currencyRate = kztRate;
-    }
-
-    const amountInRub = amount * currencyRate;
-
-    return {
-      ...item,
-      price: priceNum,
-      priceDelta,
-      amount: amount,
-      amountInRub: amountInRub,
-    };
-  });
-
-  const rub = sumBy(
-    dataWithPrices.filter(item => item.asset.currency === 'RUB'),
-    data => data.amount,
-  );
-
-  const usd = sumBy(
-    dataWithPrices.filter(item => item.asset.currency === 'USD'),
-    data => data.amount,
-  );
-
-  const kzt = sumBy(
-    dataWithPrices.filter(item => item.asset.currency === 'KZT'),
-    data => data.amount,
-  );
-
-  const totalAmount = rub + usd * usdRate + kzt * kztRate;
-
-  const dataWithWeight = dataWithPrices.map(item => {
-    const weight = (item.amountInRub / totalAmount) * 100;
-
-    return {
-      ...item,
-      weight,
-    };
-  });
-
-  return dataWithWeight;
+  return { positions, moves };
 };

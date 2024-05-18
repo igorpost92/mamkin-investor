@@ -1,7 +1,7 @@
 import React from 'react';
 import Portfolio from './Portfolio';
 import { getPortfolioData } from './getData';
-import { Asset } from '../../shared/db/entities';
+import { Asset } from '../../../shared/db/entities';
 
 export interface Position {
   asset: Asset;

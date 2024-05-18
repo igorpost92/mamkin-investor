@@ -28,6 +28,7 @@ export const Header: React.FC = () => {
         <AppNavLink href={appRoutes.splits} label={'Splits'} />
         <AppNavLink href={appRoutes.transfers} label={'Transfers'} />
         <AppNavLink href={appRoutes.portfolio} label={'Portfolio'} />
+        <AppNavLink href={appRoutes.sellsStats} label={'Sells stats'} />
         <AppNavLink href={appRoutes.import} label={'Import'} />
       </nav>
     </header>

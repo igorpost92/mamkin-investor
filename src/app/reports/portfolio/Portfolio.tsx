@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, TableColumn } from '../../shared/ui';
+import { Table, TableColumn } from '../../../shared/ui';
 import { Position } from './page';
 import { Select } from '@mantine/core';
 import { uniqBy } from 'lodash';
@@ -27,21 +27,29 @@ const Portfolio: React.FC<Props> = props => {
   const columns: TableColumn<Position>[] = [
     { name: 'asset', type: 'object', getPresentation: data => data.asset.name },
     { name: 'currency', type: 'object', width: 110, getPresentation: data => data.asset.currency },
-    { name: 'weight', type: 'number', width: 100, precision: 2 },
-    { name: 'avgPrice', title: 'Avg.price', type: 'number', width: 150, precision: 2 },
-    { name: 'price', type: 'number', width: 150, precision: 2 },
-    { name: 'priceDelta', title: 'Price (%)', type: 'number', width: 150, precision: 2 },
-    { name: 'quantity', type: 'number', width: 150 },
+    { name: 'weight', title: 'Weight, %', type: 'number', width: 110, precision: 2 },
+    { name: 'avgPrice', title: 'Avg.price', type: 'number', width: 120, precision: 2 },
+    { name: 'price', type: 'number', width: 120, precision: 2 },
+    { name: 'priceDelta', title: 'Price, %', type: 'number', width: 120, precision: 2 },
+    { name: 'quantity', type: 'number', width: 120 },
     {
       name: 'amount',
       type: 'number',
-      width: 150,
+      width: 120,
       precision: 0,
       footer: !!currency,
     },
     {
       name: 'amountInRub',
-      title: 'Amount (RUB)',
+      title: 'Amount, RUB',
+      type: 'number',
+      width: 150,
+      precision: 0,
+      footer: true,
+    },
+    {
+      name: 'amountInRubDelta',
+      title: 'Amount, delta',
       type: 'number',
       width: 150,
       precision: 0,
