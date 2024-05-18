@@ -6,15 +6,12 @@ import { importFromFreedom } from './importFromFreedom';
 
 const Alfa = () => {
   return (
-    <Stack>
-      <h4>Freedom KZ</h4>
-      <form action={importFromFreedom}>
-        <Stack>
-          <input required name={'file'} type="file" accept={'.json'} />
-          <Button type={'submit'}>import from freedom</Button>
-        </Stack>
-      </form>
-    </Stack>
+    <form action={importFromFreedom}>
+      <Stack align={'flex-start'}>
+        <input required name={'file'} type="file" accept={'.json'} />
+        <Button type={'submit'}>import</Button>
+      </Stack>
+    </form>
   );
 };
 

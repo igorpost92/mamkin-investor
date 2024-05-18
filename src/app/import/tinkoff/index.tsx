@@ -7,8 +7,7 @@ import { syncOperations } from './api/syncOperations';
 
 const Tinkoff = () => {
   return (
-    <Stack>
-      <h4>Tinkoff</h4>
+    <Stack align={'flex-start'}>
       <Button onClick={() => syncOperations()}>import operations</Button>
       <Button onClick={() => syncAssets()}>sync assets</Button>
     </Stack>
