@@ -64,7 +64,12 @@ const Portfolio: React.FC<Props> = props => {
         </div>
       </div>
       <br />
-      <Table data={assets} columns={columns} initialSort={[{ field: 'weight', order: 'desc' }]} />
+      <Table
+        data={assets}
+        columns={columns}
+        initialSort={[{ field: 'weight', order: 'desc' }]}
+        highlightRowOnHover
+      />
     </>
   );
 };
