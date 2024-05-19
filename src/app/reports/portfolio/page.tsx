@@ -2,6 +2,7 @@ import React from 'react';
 import Portfolio from './Portfolio';
 import { getPortfolioData } from './getData';
 import { Asset } from '../../../shared/db/entities';
+import { getBrokers } from '../../../shared/api';
 
 export interface Position {
   asset: Asset;
@@ -16,8 +17,9 @@ export interface Position {
 
 const PortfolioPage: React.FC = async () => {
   const data = await getPortfolioData();
+  const brokers = await getBrokers();
 
-  return <Portfolio data={data} />;
+  return <Portfolio data={data} brokers={brokers} />;
 };
 
 export default PortfolioPage;

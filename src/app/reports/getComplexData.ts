@@ -11,8 +11,12 @@ interface Position {
 
 // TODO: refacto
 
-// TODO: move to another folder
-export const getComplexData = async (brokerId?: string) => {
+interface Params {
+  brokerId?: string;
+  currency?: string;
+}
+
+export const getComplexData = async (params?: Params) => {
   // todo objects instead of columns
 
   const query = `
@@ -275,8 +279,14 @@ export const getComplexData = async (brokerId?: string) => {
       return;
     }
 
+    const asset = instanceToPlain(assets.find(item => item.id === assetId)) as Asset;
+
+    if (params?.currency && asset.currency !== params.currency) {
+      return;
+    }
+
     // TODO: refacto
-    const brokersList = brokerId ? [brokers[brokerId]] : Object.values(brokers);
+    const brokersList = params?.brokerId ? [brokers[params.brokerId]] : Object.values(brokers);
     const records = brokersList.flat();
 
     const quantity = sumBy(records, item => {
@@ -298,8 +308,6 @@ export const getComplexData = async (brokerId?: string) => {
     });
 
     const avgPrice = sum / quantity;
-
-    const asset = instanceToPlain(assets.find(item => item.id === assetId)) as Asset;
 
     positions.push({
       asset,

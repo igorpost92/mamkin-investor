@@ -1,3 +1,5 @@
+'use server';
+
 import { tinkoffOpenApi } from '../../../shared/api/tinkoffOpenApi';
 import { parseTinkoffNumber } from '../../../shared/api/tinkoffOpenApi/utils';
 import { sumBy } from 'lodash';
@@ -30,9 +32,13 @@ const getCurrencyRate = async (currency: string) => {
   return Number(parseTinkoffNumber(price));
 };
 
-// TODO: filter brokerId?: string
-export const getPortfolioData = async () => {
-  const { positions } = await getComplexData();
+interface Params {
+  brokerId?: string;
+  currency?: string;
+}
+
+export const getPortfolioData = async (params?: Params) => {
+  const { positions } = await getComplexData(params);
 
   const uids = positions.map(item => item.asset.instrumentUid).filter(Boolean) as string[];
 
