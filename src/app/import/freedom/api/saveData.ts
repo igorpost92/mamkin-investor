@@ -2,12 +2,18 @@ import { brokers } from '../../../../shared/constants';
 import {
   Asset,
   Broker,
+  Deposit,
+  Dividend,
   NewAsset,
   NewBroker,
+  NewDeposit,
+  NewDividend,
   NewPurchase,
   NewSell,
+  NewWithdrawal,
   Purchase,
   Sell,
+  Withdrawal,
 } from '../../../../shared/db/entities';
 import { getDB, NewTx } from '../../../../shared/db';
 import { FreedomAssetInfo, FreedomOperation } from '../types';
@@ -57,14 +63,25 @@ const getOrCreateAsset = async (assetInfo: FreedomAssetInfo, tx: NewTx, onCreate
   return result.identifiers[0].id;
 };
 
+const getAssetByTicker = async (ticker: string, tx: NewTx) => {
+  const repo = tx.getRepository(Asset);
+  const asset = await repo.findOne({ where: { ticker } });
+
+  if (!asset) {
+    throw new Error(`Unknown ticker ${ticker}`);
+  }
+
+  return asset.id;
+};
+
 export const saveData = async (operations: FreedomOperation[]) => {
   const count = {
     asset: 0,
-    // deposit: 0,
-    // dividend: 0,
+    deposit: 0,
+    dividend: 0,
     purchase: 0,
     sell: 0,
-    // withdraw: 0,
+    withdraw: 0,
   };
 
   console.log('saving start, operations count -', operations.length);
@@ -74,6 +91,27 @@ export const saveData = async (operations: FreedomOperation[]) => {
     const brokerId = await getOrCreateBroker(tx);
 
     for (const operation of operations) {
+      if (operation.type === 'deposit' || operation.type === 'withdrawal') {
+        const newItem: NewDeposit | NewWithdrawal = {
+          date: operation.date,
+          brokerId,
+          sum: operation.sum,
+          currency: operation.currency,
+          brokerTransactionId: operation.id,
+        };
+
+        const repo = tx.getRepository(operation.type === 'deposit' ? Deposit : Withdrawal);
+        await repo.insert(newItem);
+
+        if (operation.type === 'deposit') {
+          count.deposit++;
+        } else {
+          count.withdraw++;
+        }
+
+        continue;
+      }
+
       if (operation.type === 'purchase' || operation.type === 'sell') {
         const assetId = await getOrCreateAsset(operation.asset, tx, () => {
           count.asset++;
@@ -102,7 +140,25 @@ export const saveData = async (operations: FreedomOperation[]) => {
         continue;
       }
 
-      // TODO: rest operations
+      if (operation.type === 'dividend') {
+        const assetId = await getAssetByTicker(operation.ticker, tx);
+
+        const newItem: NewDividend = {
+          date: operation.date,
+          brokerId,
+          assetId,
+          currency: operation.currency,
+          sum: operation.sum,
+          brokerTransactionId: operation.id,
+        };
+
+        const repo = tx.getRepository(Dividend);
+        await repo.insert(newItem);
+
+        count.dividend++;
+        continue;
+      }
+
       throw new Error(`Unknown operation type ${operation.type}`);
     }
 

@@ -1,6 +1,9 @@
 type Currency = string;
 
-export type FreedomOperation = TradingOperation | CashOperation;
+export type FreedomOperation =
+  | FreedomTradingOperation
+  | FreedomCashOperation
+  | FreedomDividendOperation;
 
 export interface FreedomAssetInfo {
   name: string;
@@ -10,9 +13,9 @@ export interface FreedomAssetInfo {
   currency?: string;
 }
 
-export interface TradingOperation {
-  type: 'purchase' | 'sell';
+export interface FreedomTradingOperation {
   id: string;
+  type: 'purchase' | 'sell';
   date: Date;
   asset: FreedomAssetInfo;
   currency: Currency;
@@ -21,10 +24,19 @@ export interface TradingOperation {
   sum: number;
 }
 
-export interface CashOperation {
-  // TODO: implement
+export interface FreedomCashOperation {
+  id: string;
   type: 'deposit' | 'withdrawal';
   date: Date;
   sum: number;
   currency: Currency;
+}
+
+export interface FreedomDividendOperation {
+  id: string;
+  type: 'dividend';
+  ticker: string;
+  date: Date;
+  currency: Currency;
+  sum: number;
 }

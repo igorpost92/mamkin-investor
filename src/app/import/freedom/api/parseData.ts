@@ -1,4 +1,9 @@
-import { FreedomOperation } from '../types';
+import {
+  FreedomCashOperation,
+  FreedomDividendOperation,
+  FreedomOperation,
+  FreedomTradingOperation,
+} from '../types';
 import { getCurrencyIsin } from '../../../../shared/api/tinkoffOpenApi/constants';
 
 const parseDate = (dateStr: string) => {
@@ -25,12 +30,19 @@ const parseCurrency = (currency: string) => {
   return currency === 'RUR' ? 'RUB' : currency;
 };
 
-export const parseData = async (content: string) => {
-  const data = JSON.parse(content);
+const parseTicker = (ticker: string) => {
+  // TODO: find another solution, parse trades and securities_flows_json
+  const mapping: Record<string, string> = {
+    'NVDA.US': 'NVDA',
+    'MSFT.US': 'MSFT',
+    'VOO.US': 'VOO',
+  };
 
-  const operations: FreedomOperation[] = [];
+  return mapping[ticker] || ticker;
+};
 
-  const tradesList = data.trades.detailed;
+const parseTrades = (tradesList: any[]) => {
+  const operations: FreedomTradingOperation[] = [];
 
   tradesList.forEach(item => {
     let operationType = item.operation;
@@ -104,6 +116,91 @@ export const parseData = async (content: string) => {
 
     operations.push(operation);
   });
+
+  return operations;
+};
+
+const parseCashOperations = (list: any[]) => {
+  const operations: FreedomCashOperation[] = [];
+
+  list.forEach(item => {
+    const type = item.type;
+    let sum = parseFloat(item.amount);
+    let operationType: FreedomCashOperation['type'];
+
+    if (['dividend', 'dividend_reverted', 'tax', 'tax_reverted'].includes(type)) {
+      return;
+    }
+
+    if (type === 'bank') {
+      if (sum < 0) {
+        throw new Error('Bank withdrawal is not ready');
+      }
+      operationType = 'deposit';
+    } else if (type === 'intercompany') {
+      operationType = sum < 0 ? 'withdrawal' : 'deposit';
+      sum = Math.abs(sum);
+    } else {
+      throw new Error(`Unknown cash flow operation type ${type}`);
+    }
+
+    const date = parseDate(item.pay_d);
+    const currency = parseCurrency(item.currency);
+
+    operations.push({
+      id: item.id,
+      type: operationType,
+      date,
+      sum,
+      currency,
+    });
+  });
+
+  return operations;
+};
+
+const parseDividends = (list: any[]) => {
+  const operations: FreedomDividendOperation[] = [];
+
+  list.forEach(item => {
+    const type = item.type;
+
+    if (['bank', 'intercompany'].includes(type)) {
+      return;
+    }
+
+    const sum = parseFloat(item.amount);
+    const ticker = parseTicker(item.ticker);
+    const currency = parseCurrency(item.currency);
+    const date = parseDate(item.pay_d);
+
+    if (!['dividend', 'dividend_reverted', 'tax', 'tax_reverted'].includes(type)) {
+      throw new Error(`Unknown dividend operation type ${type}`);
+    }
+
+    // TODO: comment for reverted
+
+    operations.push({
+      id: item.id,
+      type: 'dividend',
+      date,
+      ticker,
+      currency,
+      sum,
+    });
+  });
+
+  return operations;
+};
+
+export const parseData = async (content: string) => {
+  const data = JSON.parse(content);
+
+  const tradeOperations = parseTrades(data.trades.detailed);
+  const cashOperations = parseCashOperations(data.cash_in_outs);
+  const dividends = parseDividends(data.cash_in_outs);
+
+  const operations: FreedomOperation[] = [...tradeOperations, ...cashOperations, ...dividends];
 
   return operations;
 };
