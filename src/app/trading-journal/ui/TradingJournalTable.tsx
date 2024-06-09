@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { TableColumn } from '../../../shared/ui';
+import { TableColumn } from 'mobile-kit/components/Table';
 import { appRoutes, routeWithRedirect } from '../../../shared/constants';
 import { DocumentsListTemplate } from '../../../widgets/document';
 import { TradingJournalDatum } from '../config/types';

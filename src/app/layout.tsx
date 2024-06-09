@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
-// import 'mobile-kit/index.css';
+import 'mobile-kit/theme/theme.css';
 import './globals.css';
 import styles from './layout.module.css';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';

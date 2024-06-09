@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, TableColumn } from '../../../shared/ui';
+import { Table, TableColumn } from 'mobile-kit/components/Table';
 import { Position } from '../portfolio/page';
 import { Select, Switch } from '@mantine/core';
 import { groupBy, orderBy, sumBy, uniqBy } from 'lodash';

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { TableColumn } from '../../../shared/ui';
+import { TableColumn } from 'mobile-kit/components/Table';
 import { Purchase } from '../../../shared/db/entities';
 import { appRoutes } from '../../../shared/constants';
 import { DocumentsListTemplate } from '../../../widgets/document';

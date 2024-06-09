@@ -1,7 +1,7 @@
 import React, { ComponentProps } from 'react';
 import { useTableFilters } from '../../../../kit/components/TableFilters/hooks/useTableFilters';
 import TableFilters from '../../../../kit/components/TableFilters/TableFilters';
-import { Table, TableColumn } from '../../../../shared/ui';
+import { Table, TableColumn } from 'mobile-kit/components/Table';
 import Link from 'next/link';
 import { Button, Group, Space } from '@mantine/core';
 
