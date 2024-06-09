@@ -4,6 +4,7 @@ import { getOperations } from './getOperations';
 import { saveOperations } from './saveOperations';
 import { getBrokerSyncDate } from '../../../utils/getBrokerSyncDate';
 import { brokers } from '../../../../../shared/constants';
+import { revalidateAll } from '../../../utils/revalidateAll';
 
 export const syncOperations = async () => {
   try {
@@ -22,8 +23,9 @@ export const syncOperations = async () => {
     }
 
     await saveOperations(operations);
+    revalidateAll();
 
-    // TODO: show result in front
+    // TODO: show result on front
   } catch (e) {
     console.error('error');
     throw e;

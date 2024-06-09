@@ -2,6 +2,7 @@ import { parseData } from './parseData';
 import { saveData } from './saveData';
 import { getBrokerSyncDate } from '../../utils/getBrokerSyncDate';
 import { brokers } from '../../../../shared/constants';
+import { revalidateAll } from '../../utils/revalidateAll';
 
 export const importFromFreedom = async (content: string) => {
   try {
@@ -20,6 +21,7 @@ export const importFromFreedom = async (content: string) => {
     }
 
     await saveData(operations);
+    revalidateAll();
 
     // TODO: show result
   } catch (e) {

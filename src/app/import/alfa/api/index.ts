@@ -2,6 +2,7 @@ import { parseData } from './parseData';
 import { saveData } from './saveData';
 import { getBrokerSyncDate } from '../../utils/getBrokerSyncDate';
 import { brokers } from '../../../../shared/constants';
+import { revalidateAll } from '../../utils/revalidateAll';
 
 export const importFromAlfa = async (content: Buffer) => {
   try {
@@ -19,6 +20,7 @@ export const importFromAlfa = async (content: Buffer) => {
     }
 
     await saveData(operations);
+    revalidateAll();
   } catch (e) {
     console.error('error');
     throw e;

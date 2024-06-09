@@ -2,6 +2,7 @@ import { parseFinam } from './parseData';
 import { saveOperations } from './saveData';
 import { getBrokerSyncDate } from '../../utils/getBrokerSyncDate';
 import { brokers } from '../../../../shared/constants';
+import { revalidateAll } from '../../utils/revalidateAll';
 
 export const importFromFinam = async (content: Buffer) => {
   try {
@@ -19,6 +20,7 @@ export const importFromFinam = async (content: Buffer) => {
     }
 
     await saveOperations(operations);
+    revalidateAll();
   } catch (e) {
     console.error('error');
     throw e;
