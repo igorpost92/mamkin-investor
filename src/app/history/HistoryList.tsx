@@ -8,6 +8,7 @@ import { NumberFormatter } from '@mantine/core';
 
 // TODO: little refacto
 // TODO: filters
+// TODO: portions
 
 interface Props {
   data: {
