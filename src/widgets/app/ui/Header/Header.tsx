@@ -17,6 +17,7 @@ export const Header: React.FC = () => {
         <ThemeButton />
       </Group>
       <nav className={styles.links}>
+        <AppNavLink href={appRoutes.history} label={'History'} />
         <AppNavLink href={appRoutes.tradingJournal} label={'Trading journal'} />
         <AppNavLink href={appRoutes.assets} label={'Assets'} />
         <AppNavLink href={appRoutes.brokers} label={'Brokers'} />

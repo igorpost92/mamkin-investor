@@ -1,0 +1,29 @@
+.daySection {
+  font-weight: 500;
+  margin-bottom: 12px;
+
+  * + & {
+    margin-top: 50px;
+  }
+}
+
+.card {
+  border-top: 1px solid gray;
+  display: flex;
+  gap: 20px;
+
+  & + & {
+    margin-top: 12px;
+  }
+}
+
+.time {
+}
+
+.content {
+  flex: 1 1 auto;
+}
+
+.extra {
+  text-align: end;
+}

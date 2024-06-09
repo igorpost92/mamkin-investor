@@ -41,6 +41,8 @@ export const appRoutes = {
   import: '/import',
   portfolio: '/reports/portfolio',
   sellsStats: '/reports/sellsStats',
+
+  history: '/history',
 };
 
 export const routeWithRedirect = (url: string, from: string) => {
