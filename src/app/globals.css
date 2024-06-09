@@ -17,12 +17,13 @@ body {
 /*todo  only this? */
 a {
   /*color: inherit;*/
-  color: var(--base-primary);
   text-decoration: none;
 
-  &:hover {
-    color: color-mix(in srgb, var(--base-primary) 70%, white);
-  }
+  /*color: var(--base-primary);*/
+
+  /*&:hover {*/
+  /*  color: color-mix(in srgb, var(--base-primary) 70%, white);*/
+  /*}*/
 }
 
 ul {

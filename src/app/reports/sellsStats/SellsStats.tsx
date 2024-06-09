@@ -80,8 +80,6 @@ const SellsStats: React.FC<Props> = props => {
     });
   }
 
-  console.log('bb', data);
-
   const columns: TableColumn<Position>[] = [
     { name: 'asset', type: 'object', getPresentation: data => data.asset.name },
     { name: 'currency', type: 'object', width: 110, getPresentation: data => data.asset.currency },

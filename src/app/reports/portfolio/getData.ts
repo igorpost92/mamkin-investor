@@ -37,6 +37,8 @@ interface Params {
   currency?: string;
 }
 
+// TODO: weight calculated not by 100% with filters
+
 export const getPortfolioData = async (params?: Params) => {
   const { positions } = await getComplexData(params);
 

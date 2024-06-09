@@ -61,7 +61,12 @@ export const parseData = async (content: Buffer) => {
   const fileData = content.toString();
   const dataObject: any = await parser.parseStringPromise(fileData);
 
-  const tradeOperations = readTrades(dataObject.report_broker.trades_finished[0].trade);
+  const tradesList = [
+    ...dataObject.report_broker.trades_finished[0].trade,
+    ...dataObject.report_broker.trades_unfinished[0].trade,
+  ];
+
+  const tradeOperations = readTrades(tradesList);
   const cashOperations = readMoneyMoves(dataObject.report_broker.money_moves[0].money_move);
 
   const operations = [...tradeOperations, ...cashOperations];

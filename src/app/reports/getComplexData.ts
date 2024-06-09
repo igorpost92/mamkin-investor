@@ -44,7 +44,7 @@ export const getComplexData = async (params?: Params) => {
     where a.type != 'currency'
     --and a.ticker = 'RU000A1059N9'
     order by date
-  ;`;
+  `;
 
   const db = await getDB();
   const res = await db.query(query);
