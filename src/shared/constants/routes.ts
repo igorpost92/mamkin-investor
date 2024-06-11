@@ -1,6 +1,9 @@
 import { QueryParams } from './queryParams';
 
 export const appRoutes = {
+  index: '/',
+  login: '/login',
+
   assets: '/assets',
   asset: (id: string) => `${appRoutes.assets}/${id}`,
   newAsset: () => `${appRoutes.assets}/new`,

@@ -10,7 +10,10 @@ import {
   Sell,
   Split,
   Transfer,
+  User,
+  Session,
   Withdrawal,
+  Feature,
 } from './entities';
 
 const pgConnection = new DataSource({
@@ -23,7 +26,20 @@ const pgConnection = new DataSource({
   password: 'postgres',
   synchronize: true,
   // logging: true,
-  entities: [Asset, Broker, Deposit, Dividend, Purchase, Sell, Split, Transfer, Withdrawal],
+  entities: [
+    Asset,
+    Broker,
+    Deposit,
+    Dividend,
+    Purchase,
+    Sell,
+    Split,
+    Transfer,
+    Withdrawal,
+    Feature,
+    User,
+    Session,
+  ],
 });
 
 export const getDB = async (): Promise<DataSource> => {
