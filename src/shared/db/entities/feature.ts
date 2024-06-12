@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Check, Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('features')
+@Check(`enabled = true`)
 export class Feature {
   @PrimaryColumn({ default: true })
   enabled!: boolean;
