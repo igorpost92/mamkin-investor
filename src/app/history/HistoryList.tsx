@@ -67,7 +67,7 @@ const TradeData: React.FC<{
         </div>
         <div>
           <NumberFormatter value={data.quantity} thousandSeparator={' '} />
-          &nbsp; * &nbsp;
+          &nbsp;*&nbsp;
           <NumberFormatter value={data.price} thousandSeparator={' '} />
         </div>
       </div>
