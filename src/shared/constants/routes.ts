@@ -42,7 +42,7 @@ export const appRoutes = {
 
   import: '/import',
   portfolio: '/reports/portfolio',
-  sellsStats: '/reports/sellsStats',
+  sellsStats: '/reports/sells-stats',
 
   history: '/history',
 };

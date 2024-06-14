@@ -1,6 +1,6 @@
 import { getComplexData } from '../getComplexData';
 import { getDB } from '../../../shared/db';
-import { Asset } from '../../../shared/db/entities';
+import { Asset, Broker } from '../../../shared/db/entities';
 import { instanceToPlain } from 'class-transformer';
 
 export const getSellsStatsData = async () => {
@@ -8,13 +8,15 @@ export const getSellsStatsData = async () => {
 
   const db = await getDB();
   const assets = await db.getRepository(Asset).find();
+  const brokers = await db.getRepository(Broker).find();
 
   const sells = moves
     .filter(item => item.type === 'sell')
     .map(item => {
-      const { assetId, ...restData } = item;
+      const { assetId, brokerId, ...restData } = item;
 
       const asset = instanceToPlain(assets.find(a => a.id === assetId)) as Asset;
+      const broker = instanceToPlain(brokers.find(b => b.id === brokerId)) as Broker;
 
       const quantity = Math.abs(item.quantity);
 
@@ -34,6 +36,7 @@ export const getSellsStatsData = async () => {
       return {
         ...restData,
         asset,
+        broker,
         quantity,
         delta,
       };

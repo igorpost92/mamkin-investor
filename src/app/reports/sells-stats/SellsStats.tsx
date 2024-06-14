@@ -30,6 +30,7 @@ const SellsStats: React.FC<Props> = props => {
   // TODO: refacto
 
   const [asset, setAsset] = useState<string | null>(null);
+  const [broker, setBroker] = useState<string | null>(null);
   const [currency, setCurrency] = useState<string | null>(null);
   const [groupByAsset, setGroupByAsset] = useState(true);
 
@@ -37,6 +38,18 @@ const SellsStats: React.FC<Props> = props => {
     uniqBy(props.data, item => item.asset.id).map(item => ({
       value: item.asset.id!,
       label: item.asset.name!,
+    })),
+    item => item.label,
+  );
+
+  const brokerOptions = orderBy(
+    uniqBy(
+      // TODO: remove filter, fix moves (shorts)
+      props.data.filter(item => item.broker),
+      item => item.broker.id,
+    ).map(item => ({
+      value: item.broker.id!,
+      label: item.broker.name!,
     })),
     item => item.label,
   );
@@ -54,6 +67,10 @@ const SellsStats: React.FC<Props> = props => {
 
   if (currency) {
     data = data.filter(item => item.asset.currency === currency);
+  }
+
+  if (broker) {
+    data = data.filter(item => item.broker?.id === broker);
   }
 
   if (groupByAsset) {
@@ -101,6 +118,17 @@ const SellsStats: React.FC<Props> = props => {
             value={asset}
             onChange={setAsset}
             data={assetOptions}
+          />
+        </div>
+
+        <div style={{ width: 200 }}>
+          <Select
+            label={'Broker'}
+            searchable
+            clearable
+            value={broker}
+            onChange={setBroker}
+            data={brokerOptions}
           />
         </div>
 
