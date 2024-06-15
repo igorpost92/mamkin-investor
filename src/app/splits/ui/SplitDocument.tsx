@@ -1,7 +1,13 @@
 'use client';
 
 import React from 'react';
-import { getSplit, createSplit, updateSplit, deleteSplit, getAssets } from '../../../shared/api';
+import {
+  getSplit,
+  createSplit,
+  updateSplit,
+  deleteSplit,
+} from '../../../shared/api/mainApi/splits';
+import { getAssets } from '../../../shared/api/mainApi/assets';
 import { DocumentFieldConfig } from '../../../entities/document';
 import { DocumentTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';

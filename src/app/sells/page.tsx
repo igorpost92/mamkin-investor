@@ -1,5 +1,5 @@
 import React from 'react';
-import { getSells } from '../../shared/api';
+import { getSells } from '../../shared/api/mainApi/sells';
 import SellsList from './ui/SellsList';
 
 const Sells: React.FC = async () => {

@@ -1,6 +1,6 @@
 'use server';
 
-import { killSession, registerUser, signInUser } from '../shared/api';
+import { killSession, registerUser, signInUser } from '../shared/api/mainApi/users';
 import { cookies } from 'next/headers';
 import { appRoutes, sessionIdCookieName } from '../shared/constants';
 import { redirect } from 'next/navigation';

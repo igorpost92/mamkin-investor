@@ -2,7 +2,7 @@ import React from 'react';
 import Portfolio from './Portfolio';
 import { getPortfolioData } from './getData';
 import { Asset } from '../../../shared/db/entities';
-import { getBrokers } from '../../../shared/api';
+import { getBrokers } from '../../../shared/api/mainApi/brokers';
 
 export interface Position {
   asset: Asset;

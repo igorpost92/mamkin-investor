@@ -6,9 +6,9 @@ import {
   createDividend,
   updateDividend,
   deleteDividend,
-  getBrokers,
-  getAssets,
-} from '../../../shared/api';
+} from '../../../shared/api/mainApi/dividends';
+import { getBrokers } from '../../../shared/api/mainApi/brokers';
+import { getAssets } from '../../../shared/api/mainApi/assets';
 import { DocumentFieldConfig } from '../../../entities/document';
 import { DocumentTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';

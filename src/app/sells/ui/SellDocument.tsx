@@ -1,14 +1,9 @@
 'use client';
 
 import React from 'react';
-import {
-  getSell,
-  createSell,
-  updateSell,
-  deleteSell,
-  getBrokers,
-  getAssets,
-} from '../../../shared/api';
+import { getSell, createSell, updateSell, deleteSell } from '../../../shared/api/mainApi/sells';
+import { getBrokers } from '../../../shared/api/mainApi/brokers';
+import { getAssets } from '../../../shared/api/mainApi/assets';
 import { DocumentFieldConfig } from '../../../entities/document';
 import { DocumentTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';

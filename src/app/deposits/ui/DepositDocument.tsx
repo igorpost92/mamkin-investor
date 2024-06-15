@@ -6,8 +6,8 @@ import {
   createDeposit,
   updateDeposit,
   deleteDeposit,
-  getBrokers,
-} from '../../../shared/api';
+} from '../../../shared/api/mainApi/deposits';
+import { getBrokers } from '../../../shared/api/mainApi/brokers';
 import { DocumentFieldConfig } from '../../../entities/document';
 import { DocumentTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';

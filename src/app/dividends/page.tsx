@@ -1,5 +1,5 @@
 import React from 'react';
-import { getDividends } from '../../shared/api';
+import { getDividends } from '../../shared/api/mainApi/dividends';
 import DividendsList from './ui/DividendsList';
 
 const Dividends: React.FC = async () => {

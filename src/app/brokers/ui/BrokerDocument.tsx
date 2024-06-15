@@ -1,7 +1,12 @@
 'use client';
 
 import React from 'react';
-import { getBroker, createBroker, updateBroker, deleteBroker } from '../../../shared/api';
+import {
+  getBroker,
+  createBroker,
+  updateBroker,
+  deleteBroker,
+} from '../../../shared/api/mainApi/brokers';
 import { DocumentFieldConfig } from '../../../entities/document';
 import { DocumentTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';

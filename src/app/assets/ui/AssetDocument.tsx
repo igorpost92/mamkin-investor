@@ -1,7 +1,12 @@
 'use client';
 
 import React from 'react';
-import { getAsset, createAsset, updateAsset, deleteAsset } from '../../../shared/api';
+import {
+  getAsset,
+  createAsset,
+  updateAsset,
+  deleteAsset,
+} from '../../../shared/api/mainApi/assets';
 import { DocumentFieldConfig } from '../../../entities/document';
 import { DocumentTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';

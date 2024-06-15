@@ -1,5 +1,5 @@
 import React from 'react';
-import { getFeatures } from '../../shared/api';
+import { getFeatures } from '../../shared/api/mainApi/features';
 import LoginPage from './LoginPage';
 
 const Login: React.FC = async () => {

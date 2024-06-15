@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAssets } from '../../shared/api';
+import { getAssets } from '../../shared/api/mainApi/assets';
 import AssetsList from './ui/AssetsList';
 
 const Assets: React.FC = async () => {

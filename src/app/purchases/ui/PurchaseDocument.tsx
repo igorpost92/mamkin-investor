@@ -6,9 +6,9 @@ import {
   createPurchase,
   updatePurchase,
   deletePurchase,
-  getBrokers,
-  getAssets,
-} from '../../../shared/api';
+} from '../../../shared/api/mainApi/purchases';
+import { getBrokers } from '../../../shared/api/mainApi/brokers';
+import { getAssets } from '../../../shared/api/mainApi/assets';
 import { DocumentFieldConfig } from '../../../entities/document';
 import { DocumentTemplate } from '../../../widgets/document';
 import { appRoutes } from '../../../shared/constants';
